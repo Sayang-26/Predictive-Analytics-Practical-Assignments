@@ -1,0 +1,132 @@
+---
+title: "Predictive practical set 1"
+author: "Sayan Ganguly,Roll:714"
+date: "2026-01-21"
+output: word_document
+---
+**importing and viewing first 6 rows of the dataset**
+```{r}
+library(MASS)
+head(Boston)
+```
+
+#### **Question-1:Report the “class” of the data set. How many rows and columns are in this data set? What do the rows and columns represent?** ####
+**Answer:**
+```{r}
+class(Boston)
+```
+```{r}
+dim(Boston)
+```
+So there are 506 rows and 14 columns in this dataset in which the rows represent the observations,i.e different suburbs in Boston.The columns represent the variables on which data is observed.
+
+#### **Question-2:Create a smaller data set with the variables median value of owner-occupied homes,per capita crime rate,nitrogen oxides concentration,proportion of blacks and percentage of lower status of the population.Choosing median value of owner occupied homes as the response and the rest as the predictors,make scatter plots of the response versus each predictor.Present the scatter plots in different panels of the same graph.Comment on your findings.** ####
+**Answer:**
+
+**Smaller dataset with the given variables**
+```{r}
+df=data.frame(Boston$medv,Boston$crim,Boston$nox,Boston$black,Boston$lstat)
+head(df)
+
+```
+**scatter plots**
+```{r}
+par(mfrow=c(2,2))
+plot(df$Boston.crim,df$Boston.medv,main = "medv vs. crim",xlab = "Crime rate",ylab = "Median value",col="red",)
+plot(df$Boston.nox,df$Boston.medv,main = "medv vs. nox",xlab = "NOX concentration",ylab = "Median value",col ="blue")
+plot(df$Boston.black,df$Boston.medv,main = "medv vs. black",xlab = "Proportion of blacks",ylab = "Median value",col = "magenta")
+plot(df$Boston.lstat,df$Boston.medv,main = "medv vs. lstat",xlab = "Percent of lower status population",ylab = "Median value",col = "orange")
+
+```
+
+**Comment:** 
+1)Between 0-20 crime rate most of the observations are found and as the crime rate gradually increase the median prices tend to decrease which is quite obvious.So there is a negative correlation between the two variables.
+
+2)As the nitrogen oxide concentration increases the median value of the prices decrease om the average.So there is a negative association between the two variables.There are a few clusters formed in the values of the median prices for different concentrations of nox.For NOX concentration values between 0.4 and 0.6 we observe that most of the price values are between 15000 and 35000 dollars.
+
+3)We see that proportion of black people for most of the observations is very high(close to 400).The median values of homes are highly concentrated between 10000 and 35000 dollars.Since most observations are observed against a high number of black people we cannot make a suitable comment on the nature of association.For proportion of black people less than 300 we see that the prices are somewhat evenly distributed,i.e there is no such pattern.
+
+4)We observe that as the percent of lower status population increases,median price decreases on the average and so we can conclude that there is a negative correlation between the two variables.
+
+#### **Question-3:Which suburb of Boston has lowest median value of owner-occupied homes?What are the values of the other predictors mentioned in (2), for that suburb. How do these values compare to the overall ranges for those predictors? Comment on your findings. Hint: Mention which percentile these values belong to.**
+**Answer:**
+
+**lowest median value of owner-occupied homes**
+```{r}
+arr=c(Boston$medv)
+which(arr==min(arr))
+```
+So the lowest median value of owner occupied homes occur for the 399th and the 406th suburb.
+```{r}
+Boston[c(399,406),c(1,5,12,13)]
+
+```
+**Calculation of the percentiles**
+```{r}
+
+crim=c(sort(Boston$crim))
+nox=c(sort(Boston$nox))
+black=c(sort(Boston$black))
+lstat=c(sort(Boston$lstat))
+p_crim=c(length(which(crim<=38.3518))/506*100,length(which(crim<=67.9208))/506*100)
+p_nox=length(which(nox<=0.693))/506*100
+p_black=c(length(which(black<=396.90))/506*100,length(which(black<=384.97))/506*100)
+p_lstat=c(length(which(lstat<=30.59))/506*100,length(which(lstat<=22.98))/506*100)
+p_nox
+p_crim
+p_black
+p_lstat
+
+```
+**Comment:**We observe that the values of the 4 variables under consideration corresponding to the lowest median price belong to a high percentile.So certainly the high values of crime rate,nox concentration,black population and percent of lower status of population contribute to the reduction of the median price.
+
+#### **Question-4:Does any suburb of Boston stand out for having notably high crime rates,tax rates,or pupil–teacher ratios? Hint: Use a boxplot to detect any outliers.If so,identify the suburbs that show the outlier values.** ####
+**Answer:**
+
+**Box Plots**
+```{r}
+
+par(mfrow=c(1,3))
+boxplot(Boston$crim,col="red")
+boxplot(Boston$tax,col="orange")
+boxplot(Boston$ptratio,col="purple")
+
+```
+
+Now we find out the suburbs which show the outlier values for each of the three variables seperately.
+
+**Suburbs showing outlier values for crim**
+```{r}
+crime_out=c(boxplot.stats(Boston$crim)$out)
+outlier_crim=c()
+for(i in 1:506)
+  for(j in 1:length(crime_out))
+    if(Boston$crim[i]==crime_out[j])
+      outlier_crim=append(outlier_crim,i)
+unique(outlier_crim)
+
+
+
+
+```
+**Suburbs showing outlier values for tax**
+```{r}
+print(boxplot.stats(Boston$tax)$out)
+
+```
+So there are no outlier values for tax.
+
+**Suburbs showing outlier values for ptratio**
+```{r}
+ptratio_out=c(boxplot.stats(Boston$ptratio)$out)
+outlier_ptratio=c()
+for(i in 1:506)
+  for(j in 1:length(ptratio_out))
+    if(Boston$ptratio[i]==ptratio_out[j])
+      outlier_ptratio=append(outlier_ptratio,i)
+unique(outlier_ptratio)
+
+
+
+```
+**Comment:**So there are a lot of outliers for "crim" and quite a few for "ptratio" also.
